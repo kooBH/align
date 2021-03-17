@@ -2,6 +2,8 @@
 
 #include <STFT.h>
 
+#define _ALIGN_PRINT_ 0
+
 namespace align {
 
   int getDelay(short* target,short * ref, int length) {
@@ -15,9 +17,11 @@ namespace align {
 
     // get leq largest power of 2
     p = std::log2l(length);
-    printf("p : %d\n",p);
     pp = std::pow(2, p);
+#if _ALIGN_PRINT_
+    printf("p : %d\n",p);
     printf("pp : %d\n",pp);
+#endif
 
     // create temporal buffer
     double* target_double = new double[pp+2];
@@ -27,12 +31,13 @@ namespace align {
     memset(ref_double, 0, sizeof(double) * (pp+2));
     memset(shift_double, 0, sizeof(double) * (pp+2));
 
-    // copy, copy in reverse order
+    // copy
     for (int i = 0; i < pp; i++) {
       target_double[i] = target[i];
       ref_double[i] = ref[i];
     }
-    // ?? Normalization ?
+    // Normalization 
+    // Not necessary
 
     // fft
     Ooura_FFT fft(pp, 1);
@@ -46,7 +51,7 @@ namespace align {
       ref_double[imag] = -ref_double[imag];
     }
 
-    // mul
+    // mul == conv in time domain
     for (int i = 0; i < (pp+2)/2; i++) {
       real = i + i;
       imag = real + 1;
@@ -61,7 +66,7 @@ namespace align {
     // inverse
     fft.SingleiFFT(target_double);
 
-    // fft shift
+    // fft shift : why?
     for (int i = 0; i < pp/2; i++) {
       shift_double[i] = target_double[i + pp / 2];
     }
@@ -79,12 +84,15 @@ namespace align {
 
     // adjust center
     center = pp / 2 - 1;
-    printf("max_val : %lf | max_idx : %d | center : %d\n",max_val,max_idx,center);
     delay = center - max_idx;
-    //delay = -max_idx;
+
+#if _ALIGN_PRINT_
+    printf("max_val : %lf | max_idx : %d | center : %d\n",max_val,max_idx,center);
+#endif
 
     delete[] target_double;
     delete[] ref_double;
+    delete[] shift_double;
 
     return delay;
   }
