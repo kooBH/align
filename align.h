@@ -6,7 +6,7 @@
 
 namespace align {
 
-  int getDelay(short* target,short * ref, int length) {
+  inline int getDelay(short* target,short * ref, int length) {
     int delay;
     int p, pp;
     int real, imag;
