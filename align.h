@@ -2,7 +2,7 @@
 
 #include <STFT.h>
 
-#define _ALIGN_PRINT_ 0
+#define _ALIGN_PRINT_ 1
 
 namespace align {
 
@@ -87,7 +87,7 @@ namespace align {
     delay = center - max_idx;
 
 #if _ALIGN_PRINT_
-    printf("max_val : %lf | max_idx : %d | center : %d\n",max_val,max_idx,center);
+    printf("max_val : %lf | max_idx : %d | center : %d => delay : %d\n",max_val,max_idx,center,delay);
 #endif
 
     delete[] target_double;
